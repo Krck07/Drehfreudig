@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="RationalTest" tests="40" skipped="0" failures="0" errors="0" timestamp="2025-09-05T17:30:27" hostname="KRISTOF_PC" time="0.038">
+  <properties/>
+  <testcase name="testEqualFractionsDifferentRepresentation()" classname="RationalTest" time="0.01"/>
+  <testcase name="testOperationsPreserveImmutability()" classname="RationalTest" time="0.003"/>
+  <testcase name="testImproperFractionToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testBasicMultiplicationStatic()" classname="RationalTest" time="0.0"/>
+  <testcase name="testValidFractionCreation()" classname="RationalTest" time="0.001"/>
+  <testcase name="testProperFractionToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testZeroZeroDenominatorException()" classname="RationalTest" time="0.002"/>
+  <testcase name="testNegativeWholeNumberToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testSelfEquality()" classname="RationalTest" time="0.0"/>
+  <testcase name="testDivisionByZeroException()" classname="RationalTest" time="0.0"/>
+  <testcase name="testDivisionByNegativeOne()" classname="RationalTest" time="0.0"/>
+  <testcase name="testZeroDividedByInteger()" classname="RationalTest" time="0.001"/>
+  <testcase name="testMultipleEquivalentRepresentations()" classname="RationalTest" time="0.0"/>
+  <testcase name="testMultiplicationResultingInWholeNumber()" classname="RationalTest" time="0.001"/>
+  <testcase name="testWholeNumberToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testZeroDenominatorException()" classname="RationalTest" time="0.001"/>
+  <testcase name="testReducedFractionToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testMultiplicationByZero()" classname="RationalTest" time="0.001"/>
+  <testcase name="testEqualFractionsSameRepresentation()" classname="RationalTest" time="0.0"/>
+  <testcase name="testZeroEquality()" classname="RationalTest" time="0.0"/>
+  <testcase name="testDivisionResultingInReduction()" classname="RationalTest" time="0.001"/>
+  <testcase name="testEqualFractionsNegativeRepresentation()" classname="RationalTest" time="0.0"/>
+  <testcase name="testBasicDivisionByPositiveInteger()" classname="RationalTest" time="0.001"/>
+  <testcase name="testDivisionByNegativeInteger()" classname="RationalTest" time="0.0"/>
+  <testcase name="testNegativeDenominatorNormalization()" classname="RationalTest" time="0.001"/>
+  <testcase name="testGCDReduction()" classname="RationalTest" time="0.0"/>
+  <testcase name="testChainedOperations()" classname="RationalTest" time="0.001"/>
+  <testcase name="testFractionReduction()" classname="RationalTest" time="0.0"/>
+  <testcase name="testMultiplicationWithNegatives()" classname="RationalTest" time="0.001"/>
+  <testcase name="testZeroNumerator()" classname="RationalTest" time="0.0"/>
+  <testcase name="testWholeNumberRepresentation()" classname="RationalTest" time="0.001"/>
+  <testcase name="testWholeNumberEquality()" classname="RationalTest" time="0.0"/>
+  <testcase name="testMultiplicationByOne()" classname="RationalTest" time="0.001"/>
+  <testcase name="testZeroToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testNegativeZeroDenominatorException()" classname="RationalTest" time="0.001"/>
+  <testcase name="testNullEquality()" classname="RationalTest" time="0.001"/>
+  <testcase name="testUnequalFractions()" classname="RationalTest" time="0.001"/>
+  <testcase name="testBasicMultiplicationInstance()" classname="RationalTest" time="0.0"/>
+  <testcase name="testNegativeFractionToString()" classname="RationalTest" time="0.0"/>
+  <testcase name="testDivisionByOne()" classname="RationalTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

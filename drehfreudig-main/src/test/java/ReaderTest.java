@@ -1,7 +1,5 @@
-import Exeptions.FailedReadingExeption;
+import Exeptions.FailedReadingException;
 import org.junit.jupiter.api.Test;
-
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,13 +16,13 @@ class ReaderTest {
 
     @Test
     void testMissingFileString() {
-        Exception e = assertThrows(FailedReadingExeption.class, () -> Reader.readString("missing.txt"));
+        Exception e = assertThrows(FailedReadingException.class, () -> Reader.readString("missing.txt"));
         assertEquals("This file might not exist. -- missing.txt",e.getMessage());
     }
 
     @Test
     void testUnwantedCharactersString1() {
-        Exception e = assertThrows(FailedReadingExeption.class, () -> Reader.readString("error.txt"));
+        Exception e = assertThrows(FailedReadingException.class, () -> Reader.readString("error.txt"));
         assertEquals("This file contains unwanted characters. -- error.txt",e.getMessage());
     }
 
@@ -45,13 +43,13 @@ class ReaderTest {
 
     @Test
     void testMissingFileArr() {
-        Exception e = assertThrows(FailedReadingExeption.class, () -> Reader.readChars("missing.txt"));
+        Exception e = assertThrows(FailedReadingException.class, () -> Reader.readChars("missing.txt"));
         assertEquals("This file might not exist. -- missing.txt",e.getMessage());
     }
 
     @Test
     void testUnwantedCharactersArr1() {
-        Exception e = assertThrows(FailedReadingExeption.class, () -> Reader.readChars("error.txt"));
+        Exception e = assertThrows(FailedReadingException.class, () -> Reader.readChars("error.txt"));
         assertEquals("This file contains unwanted characters. -- error.txt",e.getMessage());
     }
 

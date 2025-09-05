@@ -1,8 +1,7 @@
-import Exeptions.FailedReadingExeption;
+import Exeptions.FailedReadingException;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Reader {
@@ -13,7 +12,7 @@ public class Reader {
         try{
             res = Files.readString(Paths.get("src/main/input",filepath));
         } catch (IOException e){
-            throw new FailedReadingExeption("This file might not exist. -- "+filepath);
+            throw new FailedReadingException("This file might not exist. -- "+filepath);
         }
 
         if(res.chars()
@@ -25,7 +24,7 @@ public class Reader {
                             (sb, c) -> sb.append((char) c),
                             StringBuilder::append)
                     .toString();
-        else throw new FailedReadingExeption("This file contains unwanted characters. -- "+filepath);
+        else throw new FailedReadingException("This file contains unwanted characters. -- "+filepath);
     }
 
     public static char[] readChars(String filepath) {
