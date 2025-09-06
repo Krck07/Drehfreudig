@@ -8,13 +8,14 @@ import java.util.Objects;
 public class Brain {
     public static boolean isDrehfreudig(String tree){
         if (tree == null) return false;
+        if (tree.isEmpty()) return false;
         if (tree.equals("()")) return true;
 
         List<Pair<Rational,Integer>> info = calcInfo(tree);
 
         int i = info.size();
         for (int j = 0; j < i/2; j++) {
-            if (!info.get(j).getA().equals(info.get(i-1-j).getA()) && !Objects.equals(info.get(j).getB(), info.get(i - 1 - j).getB())){
+            if (!info.get(j).getA().equals(info.get(i-1-j).getA()) || !Objects.equals(info.get(j).getB(), info.get(i - 1 - j).getB())){
                 return false;
             }
         }
@@ -133,5 +134,12 @@ public class Brain {
         explainExample("((())(()))");//True case
         explainExample("(()())"); //Simple true case
         explainExample("((()())())"); //False case
+
+        System.out.println(isDrehfreudig("((())(()))"));
+        System.out.println(isDrehfreudig("((()())(()()()))"));
+        System.out.println(isDrehfreudig("((())())"));
+        System.out.println(isDrehfreudig("((())(()))"));
+        System.out.println(isDrehfreudig("(()())"));
+        System.out.println(isDrehfreudig("((()())())"));
     }
 }
