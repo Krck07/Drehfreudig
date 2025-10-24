@@ -3,38 +3,38 @@ package test;
 import Exeptions.FailedReadingException;
 import Helper.Pair;
 
-import java.io.InvalidClassException;
 import java.util.*;
 
 public class testLogic {
 
-    public static void collectNodes(List<Pair<Integer,Integer>> n, String s){
-        int i = 0;
+    public static List<Pair<Integer,Integer>> collectNodes(String s){
+        List<Pair<Integer,Integer>> n = new ArrayList<>();
         int c = 0;
         Stack<Pair<Integer,Integer>> stack = new Stack<>();
 
-        do {
-            if (s.charAt(i) == '(') stack.push(new Pair<>(c++,i++));
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') stack.push(new Pair<>(c++, i));
             else if (s.charAt(i) == ')') {
-                n.add(new Pair<>(stack.pop().getB(), i++));
+                Pair<Integer,Integer> st = stack.pop();
+                n.add(new Pair<>(st.getB(), i));
                 c--;
-            }
-            //todo replace with actual Exception
+            } //todo real exception maybe?
             else throw new FailedReadingException("The string is invalid");
-        } while (c>0);
+        }
 
-        //todo replace with better sort
-        n = n.stream().sorted(Comparator.comparingInt(Pair::getA)).toList();
+        //todo better sorting bc I still can't handle streams :c
+        n.sort(Comparator.comparingInt(Pair::getA));
 
         System.out.println(n);
+        return n;
     }
 
     public static void main(String[] args) {
         try {
-            collectNodes(new ArrayList<>(),"((()())(()()))");
+            List<Pair<Integer,Integer>> nodes = collectNodes("((()())(()()))");
+            System.out.println("Nodes: " + nodes);
         } catch (Exception e){
             System.out.println(e);
         }
     }
-
 }

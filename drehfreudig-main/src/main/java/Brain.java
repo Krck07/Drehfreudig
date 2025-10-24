@@ -1,3 +1,5 @@
+import Exeptions.TreeTooLargeException;
+import Helper.Node;
 import Helper.Pair;
 import Helper.Rational;
 
@@ -11,28 +13,64 @@ public class Brain {
         if (tree.isEmpty()) return false;
         if (tree.equals("()")) return true;
 
-        List<Pair<Rational,Integer>> info = calcInfo(tree);
+        final int maxWidth = 1920;
+        final int maxHeight = 1080;
+        final int spacing = 60;
 
-        int i = info.size();
+        List<Node> info = calcInfo(tree);
+        List<Node> leafs = info.stream().filter(Node::isLeaf).toList();
+
+        int i = leafs.size();
         for (int j = 0; j < i/2; j++) {
-            if (!info.get(j).getA().equals(info.get(i-1-j).getA()) || !Objects.equals(info.get(j).getB(), info.get(i - 1 - j).getB())){
+            if (!leafs.get(j).getWidth().equals(leafs.get(i-1-j).getWidth()) || !Objects.equals(leafs.get(j).getDepth(), leafs.get(i - 1 - j).getDepth())){
                 return false;
             }
         }
+
+        // start
+
+        double currX = 0.0;
+        for (Node n : leafs) {
+            n.setX(currX);
+            if (n.getDepth()*spacing>maxHeight) throw new TreeTooLargeException("The Tree is too large to display");
+            n.setY(n.getDepth()*spacing);
+            n.setHeight(spacing);
+            currX += n.getWidthAsDouble() * maxWidth;
+        }
+
+        for (Node n : info){
+            if (!n.isLeaf()){
+                double maxLeftX = Double.MAX_VALUE;
+                double maxRightX = Double.MIN_VALUE;
+
+                for (int ind : n.getChildInd()){
+                    Node child = info.get(ind);
+                    maxLeftX = Math.min(maxLeftX,child.getX());
+                    maxRightX = Math.max(maxRightX, child.getX()+child.getWidthAsDouble()*maxWidth);
+                }
+
+                n.setX((maxLeftX+maxRightX)/2);
+                n.setY(n.getDepth()*spacing);
+                n.setHeight(spacing);
+            }
+        }
+
+        //end
+
         return true;
     }
 
-    private static List<Pair<Rational,Integer>> calcInfo(String tree){
-        List<Pair<Rational,Integer>> info = new ArrayList<>();
+    private static List<Node> calcInfo(String tree){
+        List<Node> info = new ArrayList<>();
         calcInfoRec(tree, 0, tree.length()-1, new Rational(1,1),0, info);
         return info;
     }
 
-    private static void calcInfoRec(String tree, int start, int end, Rational width, int depth, List<Pair<Rational,Integer>> info){
+    private static void calcInfoRec(String tree, int start, int end, Rational width, int depth, List<Node> info){
         if (start >= end) return;
 
         if (end-start == 1 && tree.charAt(start) == '(' && tree.charAt(end) == ')'){
-            info.add(new Pair<>(width,depth));
+            info.add(new Node(width,depth));
             return;
         }
 
@@ -40,11 +78,24 @@ public class Brain {
 
         if (children.isEmpty()) return;
 
+        List<Integer> childInd = new ArrayList<>();
         Rational childWidth = width.divide(children.size());
 
         for (Pair<Integer,Integer> p : children) {
+            int cInd = info.size();
             calcInfoRec(tree, p.getA(), p.getB(), childWidth, depth+1, info);
+
+            if (info.size()>cInd){
+                for (int i = cInd; i < info.size();i++){
+                    if (info.get(i).getDepth() == depth+1){
+                        childInd.add(i);
+                        break;
+                    }
+                }
+            }
         }
+
+        info.add(new Node(width,depth,childInd));
     }
 
     private static List<Pair<Integer,Integer>> findChildren(String tree, int start, int end){
@@ -70,76 +121,5 @@ public class Brain {
             }
         }
         return range;
-    }
-
-    public static void explainExample(String brackets) {
-        System.out.println("\n=== Analyzing: " + brackets + " ===");
-
-        List<Pair<Rational, Integer>> leaves = calcInfo(brackets);
-        System.out.println("Leaves info:");
-        for (int i = 0; i < leaves.size(); i++) {
-            System.out.println("  Leaf " + i + ": width=" + leaves.get(i).getA() + ", depth=" + leaves.get(i).getB());
-        }
-
-        // Check if all leaves at same depth
-        boolean sameDepth = true;
-        if (!leaves.isEmpty()) {
-            int expectedDepth = leaves.get(0).getB();
-            for (Pair<Rational, Integer> leaf : leaves) {
-                if (leaf.getB() != expectedDepth) {
-                    sameDepth = false;
-                    System.out.println("✗ Not all leaves at same depth!");
-                    break;
-                }
-            }
-        }
-
-        if (sameDepth && !leaves.isEmpty()) {
-            System.out.println("✓ All leaves at depth " + leaves.get(0).getB());
-        }
-
-        // Check palindrome of widths
-        boolean isPalindrome = true;
-        int n = leaves.size();
-        for (int i = 0; i < n / 2; i++) {
-            if (!leaves.get(i).getA().equals(leaves.get(n - 1 - i).getA())) {
-                isPalindrome = false;
-                System.out.println("✗ Width mismatch: position " + i + " (" + leaves.get(i).getA() +
-                        ") vs position " + (n-1-i) + " (" + leaves.get(n-1-i).getA() + ")");
-                break;
-            }
-        }
-
-        if (isPalindrome && n > 1) {
-            System.out.println("✓ Widths form palindrome");
-        }
-
-        boolean isDrehfreudig = sameDepth && isPalindrome;
-        System.out.println("Therefore drehfreudig: " + isDrehfreudig);
-
-        if (isDrehfreudig) {
-            System.out.println("✓ Middle band leaf rectangles will coincide exactly!");
-        } else {
-            System.out.println("✗ Cannot achieve perfect overlap in middle band");
-        }
-    }
-
-    public static void main(String[] args) {
-        // Test the problematic example you mentioned
-        explainExample("((())(()))"); // Should be false - different depths
-
-        // Test other cases
-        explainExample("((()())(()()()))");
-        explainExample("((())())");
-        explainExample("((())(()))");//True case
-        explainExample("(()())"); //Simple true case
-        explainExample("((()())())"); //False case
-
-        System.out.println(isDrehfreudig("((())(()))"));
-        System.out.println(isDrehfreudig("((()())(()()()))"));
-        System.out.println(isDrehfreudig("((())())"));
-        System.out.println(isDrehfreudig("((())(()))"));
-        System.out.println(isDrehfreudig("(()())"));
-        System.out.println(isDrehfreudig("((()())())"));
     }
 }

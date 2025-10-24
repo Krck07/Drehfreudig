@@ -1,2 +1,2 @@
-public class Visualizer {
+public class Visualizer{
 }

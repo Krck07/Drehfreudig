@@ -44,6 +44,10 @@ public class Rational {
         return a.equals(b);
     }
 
+    public double getDecimal(){
+        return ((double) num )/den;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
