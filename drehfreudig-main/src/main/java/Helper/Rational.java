@@ -29,6 +29,10 @@ public class Rational {
         return new Rational(this.num * other.num, this.den * other.den);
     }
 
+    public int multiply(int i) {
+        return (i*this.num)/this.den;
+    }
+
     public Rational divide(int i){
         if (i == 0) throw new DivByZeroException();
         return new Rational(this.num, this.den*i);

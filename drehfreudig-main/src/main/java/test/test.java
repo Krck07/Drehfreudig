@@ -14,4 +14,8 @@ public class test extends JFrame {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
+
+    public static void main(String[] args) {
+        test t = new test();
+    }
 }
