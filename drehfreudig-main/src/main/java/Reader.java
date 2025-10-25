@@ -1,8 +1,7 @@
 import Exeptions.FailedReadingException;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 
 public class Reader {
 
@@ -10,7 +9,12 @@ public class Reader {
         String res;
 
         try{
-            res = Files.readString(Paths.get("src/main/input",filepath));
+            InputStream is = Reader.class.getClassLoader()
+                    .getResourceAsStream("input/" + filepath);
+            if (is == null) {
+                throw new FailedReadingException("This file might not exist. -- " + filepath);
+            }
+            res = new String(is.readAllBytes());
         } catch (IOException e){
             throw new FailedReadingException("This file might not exist. -- "+filepath);
         }

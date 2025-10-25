@@ -1,5 +1,3 @@
-import Exeptions.TreeTooLargeException;
-import Helper.Node;
 import Helper.Pair;
 import Helper.Rational;
 
@@ -8,69 +6,37 @@ import java.util.List;
 import java.util.Objects;
 
 public class Brain {
-    public static boolean isDrehfreudig(String tree){
-        if (tree == null) return false;
-        if (tree.isEmpty()) return false;
-        if (tree.equals("()")) return true;
+    public static Pair<Boolean,Integer> isDrehfreudig(String tree){
+        if (tree == null) return new Pair<>(false,-1);
+        if (tree.isEmpty()) return new Pair<>(false,-1);
+        if (tree.equals("()")) return new Pair<>(true,1);
 
-        final int maxWidth = 1920;
-        final int maxHeight = 1080;
-        final int spacing = 60;
+        List<Pair<Rational,Integer>> info = calcInfo(tree);
 
-        List<Node> info = calcInfo(tree);
-        List<Node> leafs = info.stream().filter(Node::isLeaf).toList();
-
-        int i = leafs.size();
+        int i = info.size();
         for (int j = 0; j < i/2; j++) {
-            if (!leafs.get(j).getWidth().equals(leafs.get(i-1-j).getWidth()) || !Objects.equals(leafs.get(j).getDepth(), leafs.get(i - 1 - j).getDepth())){
-                return false;
+            if (!info.get(j).getA().equals(info.get(i-1-j).getA()) || !Objects.equals(info.get(j).getB(), info.get(i - 1 - j).getB())){
+                return new Pair<>(false,-1);
             }
         }
 
-        // start
+        int depth = 1;
+        for (Pair<Rational,Integer> p:info) if (p.getB()> depth) depth = p.getB();
 
-        double currX = 0.0;
-        for (Node n : leafs) {
-            n.setX(currX);
-            if (n.getDepth()*spacing>maxHeight) throw new TreeTooLargeException("The Tree is too large to display");
-            n.setY(n.getDepth()*spacing);
-            n.setHeight(spacing);
-            currX += n.getWidthAsDouble() * maxWidth;
-        }
-
-        for (Node n : info){
-            if (!n.isLeaf()){
-                double maxLeftX = Double.MAX_VALUE;
-                double maxRightX = Double.MIN_VALUE;
-
-                for (int ind : n.getChildInd()){
-                    Node child = info.get(ind);
-                    maxLeftX = Math.min(maxLeftX,child.getX());
-                    maxRightX = Math.max(maxRightX, child.getX()+child.getWidthAsDouble()*maxWidth);
-                }
-
-                n.setX((maxLeftX+maxRightX)/2);
-                n.setY(n.getDepth()*spacing);
-                n.setHeight(spacing);
-            }
-        }
-
-        //end
-
-        return true;
+        return new Pair<>(true, depth);
     }
 
-    private static List<Node> calcInfo(String tree){
-        List<Node> info = new ArrayList<>();
-        calcInfoRec(tree, 0, tree.length()-1, new Rational(1,1),0, info);
+    private static List<Pair<Rational,Integer>> calcInfo(String tree){
+        List<Pair<Rational,Integer>> info = new ArrayList<>();
+        calcInfoRec(tree, 0, tree.length()-1, new Rational(1,1),1, info);
         return info;
     }
 
-    private static void calcInfoRec(String tree, int start, int end, Rational width, int depth, List<Node> info){
+    private static void calcInfoRec(String tree, int start, int end, Rational width, int depth, List<Pair<Rational,Integer>> info){
         if (start >= end) return;
 
         if (end-start == 1 && tree.charAt(start) == '(' && tree.charAt(end) == ')'){
-            info.add(new Node(width,depth));
+            info.add(new Pair<>(width,depth));
             return;
         }
 
@@ -78,24 +44,11 @@ public class Brain {
 
         if (children.isEmpty()) return;
 
-        List<Integer> childInd = new ArrayList<>();
         Rational childWidth = width.divide(children.size());
 
         for (Pair<Integer,Integer> p : children) {
-            int cInd = info.size();
             calcInfoRec(tree, p.getA(), p.getB(), childWidth, depth+1, info);
-
-            if (info.size()>cInd){
-                for (int i = cInd; i < info.size();i++){
-                    if (info.get(i).getDepth() == depth+1){
-                        childInd.add(i);
-                        break;
-                    }
-                }
-            }
         }
-
-        info.add(new Node(width,depth,childInd));
     }
 
     private static List<Pair<Integer,Integer>> findChildren(String tree, int start, int end){
@@ -121,5 +74,12 @@ public class Brain {
             }
         }
         return range;
+    }
+
+    public static void main(String[] args) {
+        String tree = Reader.readString("drehfreudig10.txt");
+        Pair<Boolean,Integer> res = isDrehfreudig(tree);
+        if (res.getA()) new Visualizer(tree,res.getB());
+        else System.out.println(false);
     }
 }

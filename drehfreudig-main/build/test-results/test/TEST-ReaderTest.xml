@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ReaderTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2025-10-25T22:47:37" hostname="KRISTOF_PC" time="0.025">
+  <properties/>
+  <testcase name="testMissingFileArr()" classname="ReaderTest" time="0.011"/>
+  <testcase name="testMissingFileString()" classname="ReaderTest" time="0.0"/>
+  <testcase name="testDemoFileArr1()" classname="ReaderTest" time="0.003"/>
+  <testcase name="testDemoFileArr2()" classname="ReaderTest" time="0.001"/>
+  <testcase name="testDemoFileString1()" classname="ReaderTest" time="0.001"/>
+  <testcase name="testDemoFileString2()" classname="ReaderTest" time="0.001"/>
+  <testcase name="testUnwantedCharactersArr1()" classname="ReaderTest" time="0.002"/>
+  <testcase name="testUnwantedCharactersArr2()" classname="ReaderTest" time="0.0"/>
+  <testcase name="testUnwantedCharactersString1()" classname="ReaderTest" time="0.001"/>
+  <testcase name="testUnwantedCharactersString2()" classname="ReaderTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

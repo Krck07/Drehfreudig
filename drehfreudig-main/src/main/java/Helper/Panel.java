@@ -1,19 +1,24 @@
-package test;
+package Helper;
 
-import Helper.Pair;
+import Exeptions.InvalidStringException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
 
-public class testPane extends JPanel {
+public class Panel extends JPanel {
 
-    private List<Pair<Integer,Integer>> nodes;
+    private final int maxDepth;
+    private final String tree;
 
-    testPane(){
+    public Panel(int maxDepth, String tree){
         this.setPreferredSize(new Dimension(1000, 1000));
+        this.maxDepth = maxDepth;
+        this.tree = tree;
     }
 
     //todo this is hella complex, bet I can fix that?
@@ -58,25 +63,43 @@ public class testPane extends JPanel {
 
     private void rec(Graphics2D g, int x, int y, int width,
                      Pair<Integer,Integer> parentCenter,
-                     List<Pair<Integer,Integer>> nodes, int nodeIdx) {
+                     List<Pair<Integer,Integer>> nodes, int nodeIdx,
+                     int currentDepth, int maxDepth) {
 
         int boxHeight = 50;
 
-        Rectangle r = new Rectangle(x, y, width, boxHeight);
+        List<Integer> children = findChildren(nodeIdx, nodes);
+        boolean isLeaf = children.isEmpty();
+
+        // Calculate rectangle height
+        int rectHeight;
+        if (isLeaf) {
+            // Extend to max depth
+            int remainingLevels = maxDepth - currentDepth;
+            rectHeight = boxHeight + (remainingLevels * boxHeight);
+        } else {
+            rectHeight = boxHeight;
+        }
+
+        // Draw rectangle
+        Rectangle r = new Rectangle(x, y, width, rectHeight);
         g.setColor(Color.yellow);
         g.fill(r);
         g.setColor(Color.black);
         g.draw(r);
 
-        int centerX = (int)r.getCenterX();
-        int centerY = (int)r.getCenterY();
+        // Draw node circle at the top of the rectangle
+        int centerX = x + width / 2;
+        int centerY = y + boxHeight / 2; // Circle stays at top
         g.fillOval(centerX - 10, centerY - 10, 20, 20);
 
-        if (parentCenter != null) g.drawLine(parentCenter.getA(), parentCenter.getB(), centerX, centerY);
+        // Draw line to parent
+        if (parentCenter != null) {
+            g.drawLine(parentCenter.getA(), parentCenter.getB(), centerX, centerY);
+        }
 
-        List<Integer> children = findChildren(nodeIdx, nodes);
-
-        if (!children.isEmpty()) {
+        // Draw children (only if not a leaf)
+        if (!isLeaf) {
             int childWidth = width / children.size();
             int childY = y + boxHeight;
 
@@ -84,9 +107,31 @@ public class testPane extends JPanel {
                 int childX = x + (i * childWidth);
                 rec(g, childX, childY, childWidth,
                         new Pair<>(centerX, centerY),
-                        nodes, children.get(i));
+                        nodes, children.get(i),
+                        currentDepth + 1, maxDepth);
             }
         }
+    }
+
+    public static List<Pair<Integer,Integer>> collectNodes(String s){
+        List<Pair<Integer,Integer>> n = new ArrayList<>();
+        int c = 0;
+        Stack<Pair<Integer,Integer>> stack = new Stack<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') stack.push(new Pair<>(c++, i));
+            else if (s.charAt(i) == ')') {
+                Pair<Integer,Integer> st = stack.pop();
+                n.add(new Pair<>(st.getB(), i));
+                c--;
+            }
+            else throw new InvalidStringException("The string is invalid");
+        }
+
+        //todo better sorting bc I still can't handle streams :c
+        n.sort(Comparator.comparingInt(Pair::getA));
+
+        return n;
     }
 
     @Override
@@ -95,7 +140,7 @@ public class testPane extends JPanel {
         Graphics2D g = (Graphics2D) gx;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        nodes = testLogic.collectNodes("((()()())((()())(()()))(()()()())(()()()))");
+        List<Pair<Integer,Integer>> nodes = collectNodes(tree);
 
         if (!nodes.isEmpty()) {
             //todo make the height stuff dynamic, this is just temporary
@@ -103,7 +148,7 @@ public class testPane extends JPanel {
             int treeHeight = 400;
             int gap = 20;
 
-            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd);
+            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd, 1, maxDepth);
 
             AffineTransform originalTransform = g.getTransform();
 
@@ -114,7 +159,7 @@ public class testPane extends JPanel {
             g.rotate(Math.PI);
             g.translate(-rotX, -50);
 
-            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd);
+            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd, 1, maxDepth);
 
             g.setTransform(originalTransform);
         }
