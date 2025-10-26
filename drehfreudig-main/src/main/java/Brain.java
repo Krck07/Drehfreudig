@@ -15,13 +15,13 @@ public class Brain {
 
         int i = info.size();
         for (int j = 0; j < i/2; j++) {
-            if (!info.get(j).getA().equals(info.get(i-1-j).getA()) || !Objects.equals(info.get(j).getB(), info.get(i - 1 - j).getB())){
+            if (!info.get(j).a().equals(info.get(i-1-j).a()) || !Objects.equals(info.get(j).b(), info.get(i - 1 - j).b())){
                 return new Pair<>(false,-1);
             }
         }
 
         int depth = 1;
-        for (Pair<Rational,Integer> p:info) if (p.getB()> depth) depth = p.getB();
+        for (Pair<Rational,Integer> p:info) if (p.b()> depth) depth = p.b();
 
         return new Pair<>(true, depth);
     }
@@ -47,7 +47,7 @@ public class Brain {
         Rational childWidth = width.divide(children.size());
 
         for (Pair<Integer,Integer> p : children) {
-            calcInfoRec(tree, p.getA(), p.getB(), childWidth, depth+1, info);
+            calcInfoRec(tree, p.a(), p.b(), childWidth, depth+1, info);
         }
     }
 
@@ -79,7 +79,7 @@ public class Brain {
     public static void main(String[] args) {
         String tree = Reader.readString("drehfreudig10.txt");
         Pair<Boolean,Integer> res = isDrehfreudig(tree);
-        if (res.getA()) new Visualizer(tree,res.getB());
+        if (res.a()) new Visualizer(tree,res.b());
         else System.out.println(false);
     }
 }

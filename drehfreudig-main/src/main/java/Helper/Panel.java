@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 
@@ -14,54 +13,46 @@ public class Panel extends JPanel {
 
     private final int maxDepth;
     private final String tree;
+    private final int maxWidth;
 
     public Panel(int maxDepth, String tree){
-        this.setPreferredSize(new Dimension(1000, 1000));
+        maxWidth = Math.min((tree.length()/2)*50,1280);
+        this.setPreferredSize(new Dimension(maxWidth+100, Math.min(maxDepth*50*2+200,1280)));
         this.maxDepth = maxDepth;
         this.tree = tree;
+
     }
 
-    //todo this is hella complex, bet I can fix that?
-    private List<Integer> findChildren(int nodeInd, List<Pair<Integer,Integer>> nodes) {
+    public static List<Integer> findChildren(int nodeInd, List<Pair<Integer,Integer>> nodes) {
         List<Integer> c = new ArrayList<>();
-        //I am your Father
+
+        if (nodes.size() <= nodeInd + 1) return c;
+
+        //I am your father again :3
         Pair<Integer,Integer> father = nodes.get(nodeInd);
-        int open = father.getA();
-        int closed = father.getB();
+        int a = father.a();
+        int b = father.b();
 
-        for (int i = 0; i < nodes.size(); i++) {
-            if (i == nodeInd) continue;
+        int skip = a;
 
-            Pair<Integer,Integer> candidate = nodes.get(i);
-            int o = candidate.getA();
-            int cl = candidate.getB();
+        for (int i = nodeInd + 1; i < nodes.size(); i++) {
+            Pair<Integer,Integer> node = nodes.get(i);
+            int open = node.a();
+            int close = node.b();
 
-            if (o > open && cl < closed) {
-                boolean b = true;
-                for (int j = 0; j < nodes.size(); j++) {
-                    if (j == nodeInd || j == i) continue;
+            if (open >= b) break;
 
-                    Pair<Integer,Integer> inters = nodes.get(j);
-                    int intOpen = inters.getA();
-                    int intClose = inters.getB();
+            if (open < skip) continue;
 
-                    if (intOpen < o && intClose > cl &&
-                            intOpen > open && intClose < closed) {
-                        b = false;
-                        break;
-                    }
-                }
+            c.add(i);
 
-                if (b) {
-                    c.add(i);
-                }
-            }
+            skip = close;
         }
 
         return c;
     }
 
-    private void rec(Graphics2D g, int x, int y, int width,
+    private void rec(Graphics2D g, int x, int y, Rational width,
                      Pair<Integer,Integer> parentCenter,
                      List<Pair<Integer,Integer>> nodes, int nodeIdx,
                      int currentDepth, int maxDepth) {
@@ -71,40 +62,34 @@ public class Panel extends JPanel {
         List<Integer> children = findChildren(nodeIdx, nodes);
         boolean isLeaf = children.isEmpty();
 
-        // Calculate rectangle height
         int rectHeight;
         if (isLeaf) {
-            // Extend to max depth
             int remainingLevels = maxDepth - currentDepth;
             rectHeight = boxHeight + (remainingLevels * boxHeight);
         } else {
             rectHeight = boxHeight;
         }
 
-        // Draw rectangle
-        Rectangle r = new Rectangle(x, y, width, rectHeight);
+        Rectangle r = new Rectangle(x, y, width.multiply(maxWidth), rectHeight);
         g.setColor(Color.yellow);
         g.fill(r);
         g.setColor(Color.black);
         g.draw(r);
 
-        // Draw node circle at the top of the rectangle
-        int centerX = x + width / 2;
-        int centerY = y + boxHeight / 2; // Circle stays at top
+        int centerX = x + width.multiply(maxWidth) / 2;
+        int centerY = y + boxHeight / 2;
         g.fillOval(centerX - 10, centerY - 10, 20, 20);
 
-        // Draw line to parent
         if (parentCenter != null) {
-            g.drawLine(parentCenter.getA(), parentCenter.getB(), centerX, centerY);
+            g.drawLine(parentCenter.a(), parentCenter.b(), centerX, centerY);
         }
 
-        // Draw children (only if not a leaf)
         if (!isLeaf) {
-            int childWidth = width / children.size();
+            Rational childWidth = width.divide(children.size());
             int childY = y + boxHeight;
 
             for (int i = 0; i < children.size(); i++) {
-                int childX = x + (i * childWidth);
+                int childX = x + childWidth.multiply(maxWidth)*i;
                 rec(g, childX, childY, childWidth,
                         new Pair<>(centerX, centerY),
                         nodes, children.get(i),
@@ -122,14 +107,13 @@ public class Panel extends JPanel {
             if (s.charAt(i) == '(') stack.push(new Pair<>(c++, i));
             else if (s.charAt(i) == ')') {
                 Pair<Integer,Integer> st = stack.pop();
-                n.add(new Pair<>(st.getB(), i));
+                n.add(new Pair<>(st.b(), i));
                 c--;
             }
             else throw new InvalidStringException("The string is invalid");
         }
 
-        //todo better sorting bc I still can't handle streams :c
-        n.sort(Comparator.comparingInt(Pair::getA));
+        InsSort.sort(n);
 
         return n;
     }
@@ -143,12 +127,11 @@ public class Panel extends JPanel {
         List<Pair<Integer,Integer>> nodes = collectNodes(tree);
 
         if (!nodes.isEmpty()) {
-            //todo make the height stuff dynamic, this is just temporary
             int rootInd = 0;
-            int treeHeight = 400;
+            int treeHeight = maxDepth*50*2;
             int gap = 20;
 
-            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd, 1, maxDepth);
+            rec(g, 50, 50, new Rational(1,1), null, nodes, rootInd, 1, maxDepth);
 
             AffineTransform originalTransform = g.getTransform();
 
@@ -159,7 +142,7 @@ public class Panel extends JPanel {
             g.rotate(Math.PI);
             g.translate(-rotX, -50);
 
-            rec(g, 50, 50, getWidth() - 100, null, nodes, rootInd, 1, maxDepth);
+            rec(g, 50, 50, new Rational(1,1), null, nodes, rootInd, 1, maxDepth);
 
             g.setTransform(originalTransform);
         }
