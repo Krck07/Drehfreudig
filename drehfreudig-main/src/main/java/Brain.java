@@ -1,4 +1,5 @@
 import Helper.Pair;
+import Helper.Panel;
 import Helper.Rational;
 
 import java.util.ArrayList;
@@ -79,7 +80,9 @@ public class Brain {
     public static void main(String[] args) {
         String tree = Reader.readString("drehfreudig10.txt");
         Pair<Boolean,Integer> res = isDrehfreudig(tree);
-        if (res.a()) new Visualizer(tree,res.b());
+        if (res.a()){
+        try{ImageExport.exportToFile(new Panel(res.b(),tree), "drehfreudig-main/src/main/resources/output/tree_output.png");}
+        catch (Exception e){ throw new RuntimeException();}}
         else System.out.println(false);
     }
 }
