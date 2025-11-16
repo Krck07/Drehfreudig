@@ -78,7 +78,7 @@ public class Brain {
     }
 
     public static void main(String[] args) {
-        String tree = Reader.readString("drehfreudig10.txt");
+        String tree = Reader.readString(args[0]);
         Pair<Boolean,Integer> res = isDrehfreudig(tree);
         if (res.a()){
         try{ImageExport.exportToFile(new Panel(res.b(),tree), "drehfreudig-main/src/main/resources/output/tree_output.png");}

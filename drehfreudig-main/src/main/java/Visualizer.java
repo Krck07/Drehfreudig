@@ -15,6 +15,6 @@ public class Visualizer extends JFrame {
     }
 
     public static void main(String[] args) {
-        Visualizer t = new Visualizer("((()())(()())(()())(())(()())(()())(()()))", 3);
+        Visualizer t = new Visualizer("((()))", 3);
     }
 }
